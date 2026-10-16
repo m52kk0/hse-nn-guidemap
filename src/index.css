@@ -2,20 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Scrollbars */
+/* Custom Scrollbars in Dark Theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0f1c1e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #25464a;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #3B6E75;
 }
 
 /* Leaflet Map full height styling */
@@ -23,4 +23,157 @@
   width: 100%;
   height: 100%;
   font-family: inherit;
+}
+
+/* ========================================================
+   LEAFLET POPUP DARK THEME STYLING
+   ======================================================== */
+.leaflet-popup-content-wrapper {
+  background: #1a3337 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(59, 110, 117, 0.7) !important;
+  box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.65), 0 0 16px rgba(59, 110, 117, 0.3) !important;
+  border-radius: 1rem !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-tip {
+  background: #1a3337 !important;
+  border: 1px solid rgba(59, 110, 117, 0.7) !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: inherit !important;
+}
+
+.leaflet-popup-content h4 {
+  color: #ffffff !important;
+}
+
+.leaflet-popup-content p {
+  color: rgba(226, 232, 240, 0.85) !important;
+}
+
+.leaflet-popup-content div.bg-slate-100 {
+  background-color: #0f1d1f !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(59, 110, 117, 0.45) !important;
+}
+
+.leaflet-popup-content div.bg-slate-100 span.font-semibold {
+  color: #67e8f9 !important;
+}
+
+.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  padding: 8px 10px !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #ffffff !important;
+}
+
+/* ========================================================
+   GLOBAL DARK THEME OVERRIDES (Brand: #3B6E75 & Deep Slate)
+   Preserves compatibility without modifying teammates' JSX files
+   ======================================================== */
+
+/* Root App container */
+body, #root, #root > div.bg-slate-100 {
+  background-color: #0f1c1e !important;
+}
+
+/* Header Dark Theme */
+header.bg-white {
+  background-color: #122123 !important;
+  border-color: rgba(59, 110, 117, 0.35) !important;
+}
+header h1.text-slate-900 {
+  color: #ffffff !important;
+}
+header p.text-slate-500 {
+  color: #8da4a8 !important;
+}
+header .bg-blue-600 {
+  background-color: #3B6E75 !important;
+  box-shadow: 0 4px 14px rgba(59, 110, 117, 0.35) !important;
+}
+header span.bg-blue-50 {
+  background-color: rgba(59, 110, 117, 0.25) !important;
+  color: #6ed1de !important;
+  border-color: rgba(59, 110, 117, 0.5) !important;
+}
+header div.bg-slate-100 {
+  background-color: #182e31 !important;
+  color: #cbd5e1 !important;
+  border: 1px solid rgba(59, 110, 117, 0.35) !important;
+}
+header div.bg-slate-100 strong {
+  color: #ffffff !important;
+}
+header div.bg-slate-100 svg {
+  color: #5ab3bf !important;
+}
+
+/* Sidebar Dark Theme */
+aside.bg-slate-50\/50, aside {
+  background-color: #122123 !important;
+  border-color: rgba(59, 110, 117, 0.35) !important;
+}
+
+/* Sidebar Search & Filters Header */
+aside > div.bg-white {
+  background-color: #16292b !important;
+  border-color: rgba(59, 110, 117, 0.35) !important;
+}
+
+/* Search input */
+aside input[type="text"] {
+  background-color: #0d181a !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(59, 110, 117, 0.45) !important;
+}
+aside input[type="text"]:focus {
+  background-color: #0f1c1e !important;
+  border-color: #5ab3bf !important;
+  box-shadow: 0 0 0 2px rgba(90, 179, 191, 0.2) !important;
+}
+aside input[type="text"]::placeholder {
+  color: #6a8c91 !important;
+}
+aside .relative svg.text-slate-400 {
+  color: #6a8c91 !important;
+}
+
+/* Filter Tabs */
+aside button.border-slate-200 {
+  background-color: #112124 !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(59, 110, 117, 0.4) !important;
+}
+aside button.border-slate-200:hover {
+  background-color: #1b3336 !important;
+  color: #ffffff !important;
+  border-color: rgba(90, 179, 191, 0.6) !important;
+}
+aside button.bg-blue-600 {
+  background-color: #3B6E75 !important;
+  border-color: #5ab3bf !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(59, 110, 117, 0.45) !important;
+}
+
+/* Empty search state */
+aside div.text-slate-400 {
+  color: #72969b !important;
+}
+
+/* Mobile Toggle Floating Button */
+div.fixed button.bg-slate-900 {
+  background-color: #3B6E75 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 10px 25px rgba(15, 28, 30, 0.8) !important;
 }
