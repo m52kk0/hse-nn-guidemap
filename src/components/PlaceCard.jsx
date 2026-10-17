@@ -12,6 +12,9 @@ import PlaceDetailModal from './PlaceDetailModal.jsx';
 
 const STORAGE_KEY = 'nn_visited_places';
 
+const DEFAULT_FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
+
 const CATEGORY_MAP = {
   architecture: {
     label: 'Архитектура',
@@ -203,10 +206,15 @@ export default function PlaceCard({ place, isSelected, onSelect }) {
         {/* Card Image and Badges */}
         <div className="relative h-44 w-full rounded-xl overflow-hidden bg-slate-950/60 mb-3 border border-white/10">
           <img
-            src={place.imageUrl}
+            src={place.imageUrl || DEFAULT_FALLBACK_IMAGE}
             alt={place.title}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              if (e.target.src !== DEFAULT_FALLBACK_IMAGE) {
+                e.target.src = DEFAULT_FALLBACK_IMAGE;
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25 pointer-events-none" />
 

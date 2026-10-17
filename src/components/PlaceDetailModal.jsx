@@ -12,6 +12,9 @@ import {
   Compass,
 } from 'lucide-react';
 
+const DEFAULT_FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
+
 const CATEGORY_MAP = {
   architecture: {
     label: 'Архитектура',
@@ -95,9 +98,14 @@ export default function PlaceDetailModal({
         {/* Modal Header with Image */}
         <div className="relative h-64 sm:h-72 w-full shrink-0 bg-slate-950 overflow-hidden">
           <img
-            src={place.imageUrl}
+            src={place.imageUrl || DEFAULT_FALLBACK_IMAGE}
             alt={place.title}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              if (e.target.src !== DEFAULT_FALLBACK_IMAGE) {
+                e.target.src = DEFAULT_FALLBACK_IMAGE;
+              }
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a3337] via-[#1a3337]/50 to-transparent" />
 
