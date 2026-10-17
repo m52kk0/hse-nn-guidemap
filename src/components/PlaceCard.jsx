@@ -9,6 +9,7 @@ import {
   Info,
 } from 'lucide-react';
 import PlaceDetailModal from './PlaceDetailModal.jsx';
+import { handleImageFallback } from '../utils/imageFallback.js';
 
 const STORAGE_KEY = 'nn_visited_places';
 
@@ -205,6 +206,7 @@ export default function PlaceCard({ place, isSelected, onSelect }) {
           <img
             src={place.imageUrl}
             alt={place.title}
+            onError={(e) => handleImageFallback(e, place.category)}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />

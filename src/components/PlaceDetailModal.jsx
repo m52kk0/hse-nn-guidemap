@@ -11,6 +11,7 @@ import {
   Navigation,
   Compass,
 } from 'lucide-react';
+import { handleImageFallback } from '../utils/imageFallback.js';
 
 const CATEGORY_MAP = {
   architecture: {
@@ -97,6 +98,7 @@ export default function PlaceDetailModal({
           <img
             src={place.imageUrl}
             alt={place.title}
+            onError={(e) => handleImageFallback(e, place.category)}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#1a3337] via-[#1a3337]/50 to-transparent" />
