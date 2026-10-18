@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Map } from 'lucide-react';
+import { Search, MapPinOff } from 'lucide-react';
 import FilterTabs from './FilterTabs.jsx';
 import PlaceCard from './PlaceCard.jsx';
 
@@ -7,23 +7,25 @@ export default function Sidebar({
   places,
   selectedPlace,
   onSelectPlace,
+  onOpenDetails,
   searchQuery,
   onSearchChange,
   selectedCategory,
   onSelectCategory,
+  visitedIds,
+  onToggleVisited,
 }) {
   return (
-    <aside className="w-full md:w-[420px] lg:w-[460px] h-full flex flex-col bg-slate-50/50 border-r border-slate-200 shrink-0">
-      {/* Search and Filters Header */}
-      <div className="p-4 bg-white border-b border-slate-200 space-y-3">
+    <aside className="w-full md:w-[400px] lg:w-[440px] h-full flex flex-col bg-zinc-900/95 border-r border-zinc-800 shrink-0">
+      <div className="p-3.5 bg-zinc-900 border-b border-zinc-800 space-y-2.5">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input
             type="text"
-            placeholder="Поиск по местам или описанию..."
+            placeholder="Поиск по местам, районам..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm bg-slate-100 hover:bg-slate-150 focus:bg-white border border-transparent focus:border-blue-500 rounded-xl outline-none transition-all placeholder:text-slate-400"
+            className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-zinc-800 text-zinc-100 placeholder-zinc-500 border border-zinc-700/80 rounded-lg outline-none focus:border-[#3B6E75] focus:ring-1 focus:ring-[#3B6E75] transition-colors"
           />
         </div>
 
@@ -33,13 +35,12 @@ export default function Sidebar({
         />
       </div>
 
-      {/* Places List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-3.5 space-y-3">
         {places.length === 0 ? (
-          <div className="h-64 flex flex-col items-center justify-center text-center p-6 text-slate-400">
-            <Map className="w-10 h-10 mb-2 stroke-1" />
-            <p className="text-sm font-medium">Ничего не найдено</p>
-            <p className="text-xs">Попробуйте изменить запрос или фильтр</p>
+          <div className="h-48 flex flex-col items-center justify-center text-center p-6 text-zinc-500">
+            <MapPinOff className="w-8 h-8 mb-2 stroke-[1.5]" />
+            <p className="text-sm font-medium text-zinc-300">Ничего не найдено</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Попробуйте изменить категорию или поисковый запрос</p>
           </div>
         ) : (
           places.map((place) => (
@@ -48,6 +49,9 @@ export default function Sidebar({
               place={place}
               isSelected={selectedPlace?.id === place.id}
               onSelect={() => onSelectPlace(place)}
+              onOpenDetails={() => onOpenDetails(place)}
+              isVisited={visitedIds.includes(place.id)}
+              onToggleVisited={() => onToggleVisited(place.id)}
             />
           ))
         )}

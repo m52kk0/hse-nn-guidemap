@@ -2,44 +2,69 @@ import React, { useState, useMemo } from 'react';
 import Header from './components/Header.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import MapView from './components/MapView.jsx';
+import PlaceDetailModal from './components/PlaceDetailModal.jsx';
 import rawPlaces from './data/places.json';
 import { Map, List } from 'lucide-react';
 
+const VISITED_STORAGE_KEY = 'nn_visited_places';
+
+function loadVisitedPlaces() {
+  try {
+    const data = localStorage.getItem(VISITED_STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function App() {
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [modalPlace, setModalPlace] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [mobileView, setMobileView] = useState('list'); // 'list' or 'map' for small screens
+  const [mobileView, setMobileView] = useState('list');
+  const [visitedIds, setVisitedIds] = useState(loadVisitedPlaces);
 
-  // Filter places based on search query and category
+  const toggleVisited = (id) => {
+    setVisitedIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      try {
+        localStorage.setItem(VISITED_STORAGE_KEY, JSON.stringify(next));
+      } catch (err) {
+        console.error(err);
+      }
+      return next;
+    });
+  };
+
   const filteredPlaces = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
     return rawPlaces.filter((place) => {
-      const matchesCategory =
-        selectedCategory === 'all' || place.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || place.category === selectedCategory;
       const matchesSearch =
-        place.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        place.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        place.district.toLowerCase().includes(searchQuery.toLowerCase());
+        !query ||
+        place.title.toLowerCase().includes(query) ||
+        place.description.toLowerCase().includes(query) ||
+        (place.district && place.district.toLowerCase().includes(query));
       return matchesCategory && matchesSearch;
     });
   }, [searchQuery, selectedCategory]);
 
   const handleSelectPlace = (place) => {
     setSelectedPlace(place);
-    // On mobile, automatically switch to map view when place is clicked
     if (window.innerWidth < 768) {
       setMobileView('map');
     }
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-100 overflow-hidden">
-      {/* Top Header */}
-      <Header totalPlaces={rawPlaces.length} />
+    <div className="flex flex-col h-screen w-screen bg-zinc-950 text-zinc-100 overflow-hidden font-sans">
+      <Header
+        totalPlaces={rawPlaces.length}
+        visitedCount={visitedIds.length}
+      />
 
-      {/* Main Split Screen Area */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left Sidebar (Desktop: always visible, Mobile: toggled by tab) */}
         <div
           className={`h-full md:block ${
             mobileView === 'list' ? 'block w-full' : 'hidden'
@@ -49,14 +74,16 @@ export default function App() {
             places={filteredPlaces}
             selectedPlace={selectedPlace}
             onSelectPlace={handleSelectPlace}
+            onOpenDetails={(place) => setModalPlace(place)}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
+            visitedIds={visitedIds}
+            onToggleVisited={toggleVisited}
           />
         </div>
 
-        {/* Right Map Container */}
         <main
           className={`flex-1 h-full relative ${
             mobileView === 'map' ? 'block w-full' : 'hidden'
@@ -65,30 +92,41 @@ export default function App() {
           <MapView
             places={filteredPlaces}
             selectedPlace={selectedPlace}
-            onSelectPlace={setSelectedPlace}
+            onSelectPlace={handleSelectPlace}
+            onOpenDetails={(place) => setModalPlace(place)}
           />
         </main>
       </div>
 
-      {/* Mobile Floating Toggle Button */}
-      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
         <button
           onClick={() => setMobileView(mobileView === 'list' ? 'map' : 'list')}
-          className="flex items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-full font-medium shadow-2xl shadow-slate-900/40 text-sm active:scale-95 transition-transform"
+          className="flex items-center gap-2 bg-[#3B6E75] hover:bg-[#488790] text-white px-5 py-2.5 rounded-full font-medium shadow-lg shadow-black/50 text-sm transition-colors"
         >
           {mobileView === 'list' ? (
             <>
-              <Map className="w-4 h-4 text-blue-400" />
-              <span>Показать карту</span>
+              <Map className="w-4 h-4" />
+              <span>Карта</span>
             </>
           ) : (
             <>
-              <List className="w-4 h-4 text-blue-400" />
-              <span>Показать список</span>
+              <List className="w-4 h-4" />
+              <span>Список мест</span>
             </>
           )}
         </button>
       </div>
+
+      {modalPlace && (
+        <PlaceDetailModal
+          place={modalPlace}
+          isOpen={Boolean(modalPlace)}
+          onClose={() => setModalPlace(null)}
+          onSelect={handleSelectPlace}
+          isVisited={visitedIds.includes(modalPlace.id)}
+          onToggleVisited={() => toggleVisited(modalPlace.id)}
+        />
+      )}
     </div>
   );
 }
