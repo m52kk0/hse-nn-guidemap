@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { handleImageFallback } from '../utils/imageFallback.js';
 
 // Fix standard Leaflet marker icons when bundling with Vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -67,6 +68,7 @@ export default function MapView({ places, selectedPlace, onSelectPlace }) {
                 <img
                   src={place.imageUrl}
                   alt={place.title}
+                  onError={(e) => handleImageFallback(e, place.category)}
                   className="w-full h-28 object-cover rounded-lg mb-2"
                 />
                 <h4 className="font-bold text-sm text-slate-900 mb-1 leading-snug">

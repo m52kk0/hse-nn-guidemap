@@ -11,6 +11,7 @@ import {
   Navigation,
   Compass,
 } from 'lucide-react';
+import { handleImageFallback } from '../utils/imageFallback.js';
 
 const DEFAULT_FALLBACK_IMAGE =
   'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80';
@@ -100,6 +101,7 @@ export default function PlaceDetailModal({
           <img
             src={place.imageUrl || DEFAULT_FALLBACK_IMAGE}
             alt={place.title}
+            onError={(e) => handleImageFallback(e, place.category)}
             className="w-full h-full object-cover"
             onError={(e) => {
               if (e.target.src !== DEFAULT_FALLBACK_IMAGE) {
