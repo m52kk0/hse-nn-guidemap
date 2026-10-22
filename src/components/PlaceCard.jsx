@@ -1,84 +1,162 @@
-import React, { useState } from 'react';
-import { MapPin, Utensils, Camera, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { MapPin, Utensils, Camera, ChevronDown, ChevronUp, Check, Info } from 'lucide-react';
+import { handleImageFallback } from '../utils/imageFallback.js';
 
-export default function PlaceCard({ place, isSelected, onSelect }) {
+const CATEGORY_NAMES = {
+  architecture: 'Архитектура',
+  view: 'Смотровые',
+  art: 'Стрит-арт',
+  photo: 'Фотоспоты',
+};
+
+export default function PlaceCard({
+  place,
+  isSelected,
+  onSelect,
+  onOpenDetails,
+  isVisited,
+  onToggleVisited,
+}) {
+  const cardRef = useRef(null);
   const [showFood, setShowFood] = useState(false);
+
+  useEffect(() => {
+    if (isSelected && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [isSelected]);
+
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect(place);
+    }
+  };
+
+  const handleVisitedClick = (e) => {
+    e.stopPropagation();
+    if (onToggleVisited) {
+      onToggleVisited();
+    }
+  };
+
+  const handleDetailsClick = (e) => {
+    e.stopPropagation();
+    if (onOpenDetails) {
+      onOpenDetails();
+    }
+  };
+
+  const handleFoodClick = (e) => {
+    e.stopPropagation();
+    setShowFood(!showFood);
+  };
+
+  const categoryLabel = CATEGORY_NAMES[place.category] || place.category;
 
   return (
     <div
-      onClick={onSelect}
-      className={`group cursor-pointer rounded-2xl border transition-all duration-300 bg-white p-3 shadow-sm hover:shadow-md ${
+      ref={cardRef}
+      onClick={handleCardClick}
+      className={`group cursor-pointer rounded-xl border p-3 transition-colors ${
         isSelected
-          ? 'border-blue-600 ring-2 ring-blue-500/20 shadow-blue-500/10'
-          : 'border-slate-200 hover:border-slate-300'
+          ? 'bg-zinc-800/90 border-[#3B6E75] ring-1 ring-[#3B6E75]'
+          : 'bg-zinc-900 border-zinc-800 hover:border-[#3B6E75]/70'
       }`}
     >
-      <div className="relative h-44 w-full rounded-xl overflow-hidden bg-slate-100 mb-3">
+      <div className="relative h-40 w-full rounded-lg overflow-hidden bg-zinc-950 mb-2.5">
         <img
           src={place.imageUrl}
           alt={place.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => handleImageFallback(e, place.category)}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-102"
           loading="lazy"
         />
-        <div className="absolute top-2.5 left-2.5 bg-slate-900/70 backdrop-blur-md text-white text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
-          <MapPin className="w-3 h-3 text-blue-400" />
-          <span>{place.district}</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+
+        <div className="absolute top-2 left-2 flex items-center gap-1.5">
+          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-zinc-900/80 text-zinc-200 border border-zinc-700/70">
+            {categoryLabel}
+          </span>
+          {place.district && (
+            <span className="text-[11px] px-2 py-0.5 rounded bg-zinc-900/80 text-zinc-300 border border-zinc-700/70 flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-[#79c0c8]" />
+              <span>{place.district}</span>
+            </span>
+          )}
         </div>
+
+        <button
+          type="button"
+          onClick={handleVisitedClick}
+          className={`absolute top-2 right-2 text-xs font-medium px-2.5 py-1 rounded flex items-center gap-1 transition-colors ${
+            isVisited
+              ? 'bg-[#3B6E75] text-white shadow-sm'
+              : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/70'
+          }`}
+        >
+          <Check className={`w-3.5 h-3.5 ${isVisited ? 'stroke-[2.5]' : 'opacity-70'}`} />
+          <span>{isVisited ? 'Посещено' : 'Был здесь'}</span>
+        </button>
       </div>
 
-      <div className="space-y-2">
-        <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+      <div className="space-y-1.5">
+        <h3 className="font-semibold text-zinc-100 text-sm sm:text-base leading-snug group-hover:text-[#79c0c8] transition-colors">
           {place.title}
         </h3>
-        
-        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+
+        <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
           {place.description}
         </p>
 
         {place.photoTips && (
-          <div className="bg-amber-50/80 border border-amber-200/60 rounded-lg p-2 flex items-start gap-2 text-[11px] text-amber-800">
-            <Camera className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-            <p className="line-clamp-2">
-              <strong className="font-medium">Совет: </strong>{place.photoTips}
-            </p>
-          </div>
-        )}
-
-        {place.foodNearby && place.foodNearby.length > 0 && (
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowFood(!showFood);
-              }}
-              className="w-full flex items-center justify-between text-[11px] font-medium text-slate-500 hover:text-slate-800 py-1"
-            >
-              <span className="flex items-center gap-1.5">
-                <Utensils className="w-3.5 h-3.5 text-blue-600" />
-                Где перекусить рядом ({place.foodNearby.length})
-              </span>
-              {showFood ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            </button>
-
-            {showFood && (
-              <div className="mt-1.5 space-y-1.5 bg-slate-50 rounded-lg p-2 border border-slate-100">
-                {place.foodNearby.map((cafe, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs">
-                    <div>
-                      <span className="font-medium text-slate-800">{cafe.name}</span>
-                      <span className="text-[10px] text-slate-400 ml-1.5">({cafe.type})</span>
-                    </div>
-                    <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
-                      {cafe.distance}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="flex items-center gap-1 text-[11px] text-amber-300/80 truncate pt-0.5">
+            <Camera className="w-3 h-3 shrink-0" />
+            <span className="truncate">{place.photoTips}</span>
           </div>
         )}
       </div>
+
+      <div className="mt-3 pt-2.5 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={handleDetailsClick}
+          className="flex-1 py-1.5 px-3 rounded-lg bg-[#3B6E75] hover:bg-[#488790] text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+        >
+          <Info className="w-3.5 h-3.5" />
+          <span>Подробнее</span>
+        </button>
+
+        {place.foodNearby && place.foodNearby.length > 0 && (
+          <button
+            type="button"
+            onClick={handleFoodClick}
+            className="py-1.5 px-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition-colors flex items-center gap-1 border border-zinc-700/60"
+          >
+            <Utensils className="w-3.5 h-3.5 text-[#79c0c8]" />
+            <span>Еда ({place.foodNearby.length})</span>
+            {showFood ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+        )}
+      </div>
+
+      {showFood && place.foodNearby && place.foodNearby.length > 0 && (
+        <div className="mt-2.5 pt-2 border-t border-zinc-800 space-y-1.5">
+          {place.foodNearby.map((cafe, idx) => (
+            <div
+              key={idx}
+              className="text-xs p-2 rounded bg-zinc-850 border border-zinc-800 flex items-center justify-between"
+            >
+              <div>
+                <span className="font-medium text-zinc-200">{cafe.name}</span>
+                <span className="text-zinc-500 text-[11px] ml-1.5">({cafe.type})</span>
+              </div>
+              <span className="text-[11px] text-[#79c0c8] bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">
+                {cafe.distance}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

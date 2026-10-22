@@ -1,24 +1,33 @@
 import React from 'react';
-import { Compass, MapPin } from 'lucide-react';
+import { Compass, CheckCircle2 } from 'lucide-react';
 
-export default function Header({ totalPlaces }) {
+export default function Header({ totalPlaces, visitedCount = 0 }) {
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shadow-sm shrink-0">
+    <header className="h-14 bg-zinc-900 border-b border-zinc-800 px-4 sm:px-6 flex items-center justify-between shrink-0">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-          <Compass className="w-6 h-6 animate-pulse" />
+        <div className="w-8 h-8 rounded-lg bg-[#3B6E75] flex items-center justify-center text-white">
+          <Compass className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-slate-900 leading-tight flex items-center gap-2">
-            Нижний Новгород <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-semibold border border-blue-200">Гид</span>
+          <h1 className="text-sm sm:text-base font-semibold text-zinc-100 flex items-center gap-2">
+            Нижний Новгород
+            <span className="text-[11px] font-normal px-2 py-0.5 rounded bg-zinc-800 text-[#71b1b9] border border-zinc-700">
+              Путеводитель
+            </span>
           </h1>
-          <p className="text-xs text-slate-500">Интерактивная карта атмосферных мест</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg">
-        <MapPin className="w-4 h-4 text-blue-600" />
-        <span>Локаций в базе: <strong className="text-slate-900">{totalPlaces}</strong></span>
+      <div className="flex items-center gap-3 text-xs">
+        <div className="text-zinc-400 hidden sm:block">
+          Локаций в базе: <span className="text-zinc-200 font-medium">{totalPlaces}</span>
+        </div>
+        {visitedCount > 0 && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#3B6E75]/20 text-[#8ec8ce] border border-[#3B6E75]/40 font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Посещено: {visitedCount}</span>
+          </div>
+        )}
       </div>
     </header>
   );

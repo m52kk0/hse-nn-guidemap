@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { handleImageFallback } from '../utils/imageFallback.js';
 
-// Fix standard Leaflet marker icons when bundling with Vite
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -10,15 +10,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Helper component to smoothly center map on selected place
 function MapController({ selectedPlace }) {
   const map = useMap();
 
   useEffect(() => {
     if (selectedPlace && selectedPlace.coords) {
       map.flyTo(selectedPlace.coords, 15, {
-        duration: 1.5,
-        easeLinearity: 0.25,
+        duration: 1.2,
       });
     }
   }, [selectedPlace, map]);
@@ -26,8 +24,8 @@ function MapController({ selectedPlace }) {
   return null;
 }
 
-export default function MapView({ places, selectedPlace, onSelectPlace }) {
-  const defaultCenter = [56.3269, 44.0059]; // Nizhny Novgorod center
+export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDetails }) {
+  const defaultCenter = [56.3269, 44.0059];
   const markerRefs = useRef({});
 
   useEffect(() => {
@@ -63,23 +61,38 @@ export default function MapView({ places, selectedPlace, onSelectPlace }) {
             }}
           >
             <Popup className="custom-leaflet-popup">
-              <div className="w-56 p-1">
+              <div className="w-56 p-1 text-zinc-100">
                 <img
                   src={place.imageUrl}
                   alt={place.title}
-                  className="w-full h-28 object-cover rounded-lg mb-2"
+                  onError={(e) => handleImageFallback(e, place.category)}
+                  className="w-full h-24 object-cover rounded mb-2"
                 />
-                <h4 className="font-bold text-sm text-slate-900 mb-1 leading-snug">
+                <h4 className="font-semibold text-xs sm:text-sm text-zinc-100 mb-1 leading-snug">
                   {place.title}
                 </h4>
-                <p className="text-xs text-slate-600 line-clamp-2 mb-2">
+                <p className="text-[11px] text-zinc-400 line-clamp-2 mb-2 leading-relaxed">
                   {place.description}
                 </p>
+
                 {place.foodNearby && place.foodNearby[0] && (
-                  <div className="text-[11px] bg-slate-100 p-1.5 rounded text-slate-700">
-                    🍔 Рядом: <span className="font-semibold">{place.foodNearby[0].name}</span> ({place.foodNearby[0].distance})
+                  <div className="text-[10px] bg-zinc-800 text-zinc-300 p-1.5 rounded mb-2 border border-zinc-700/60">
+                    🍔 Рядом: <span className="text-zinc-200 font-medium">{place.foodNearby[0].name}</span> ({place.foodNearby[0].distance})
                   </div>
                 )}
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onOpenDetails) {
+                      onOpenDetails(place);
+                    }
+                  }}
+                  className="w-full py-1 px-2 bg-[#3B6E75] hover:bg-[#488790] text-white text-[11px] font-medium rounded transition-colors"
+                >
+                  Подробнее
+                </button>
               </div>
             </Popup>
           </Marker>
