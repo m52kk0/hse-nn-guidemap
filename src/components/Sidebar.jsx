@@ -11,10 +11,14 @@ export default function Sidebar({
   onSearchChange,
   selectedCategory,
   onSelectCategory,
+  // НОВЫЕ ПРОПСЫ:
+  isRoutesTab,
+  setIsRoutesTab,
+  showFoodFilter,
+  setShowFoodFilter,
 }) {
   return (
     <aside className="w-full md:w-[420px] lg:w-[460px] h-full flex flex-col bg-slate-50/50 border-r border-slate-200 shrink-0">
-      {/* Search and Filters Header */}
       <div className="p-4 bg-white border-b border-slate-200 space-y-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -30,10 +34,14 @@ export default function Sidebar({
         <FilterTabs
           selectedCategory={selectedCategory}
           onSelectCategory={onSelectCategory}
+          // ПЕРЕДАЕМ НОВЫЕ ПРОПСЫ:
+          isRoutesTab={isRoutesTab}
+          setIsRoutesTab={setIsRoutesTab}
+          showFoodFilter={showFoodFilter}
+          setShowFoodFilter={setShowFoodFilter}
         />
       </div>
 
-      {/* Places List */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {places.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-center p-6 text-slate-400">

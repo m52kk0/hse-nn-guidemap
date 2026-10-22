@@ -9,7 +9,11 @@ export default function App() {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [mobileView, setMobileView] = useState('list'); // 'list' or 'map' for small screens
+  const [mobileView, setMobileView] = useState('list');
+
+  // НОВОЕ: Состояния для вкладки маршрутов и фильтра еды
+  const [isRoutesTab, setIsRoutesTab] = useState(false);
+  const [showFoodFilter, setShowFoodFilter] = useState(false);
 
   // Filter places based on search query and category
   const filteredPlaces = useMemo(() => {
@@ -20,13 +24,23 @@ export default function App() {
         place.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         place.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         place.district.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+
+      // НОВОЕ: Логика фильтрации
+      
+      // 1. Где поесть рядом: проверяем, что массив foodNearby существует и в нем есть элементы
+      const matchesFood = !showFoodFilter || (place.foodNearby && place.foodNearby.length > 0);
+
+      // 2. Готовые маршруты: так как в JSON нет поля routes, 
+      // мы сделаем подборку из самых атмосферных мест (например, только 'view' и 'art')
+      // Если хочешь добавить свои маршруты, в будущем можно будет добавить поле в JSON
+      const matchesRoute = !isRoutesTab || ['view', 'art'].includes(place.category);
+
+      return matchesCategory && matchesSearch && matchesRoute && matchesFood;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, isRoutesTab, showFoodFilter]);
 
   const handleSelectPlace = (place) => {
     setSelectedPlace(place);
-    // On mobile, automatically switch to map view when place is clicked
     if (window.innerWidth < 768) {
       setMobileView('map');
     }
@@ -34,12 +48,9 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen bg-slate-100 overflow-hidden">
-      {/* Top Header */}
       <Header totalPlaces={rawPlaces.length} />
 
-      {/* Main Split Screen Area */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left Sidebar (Desktop: always visible, Mobile: toggled by tab) */}
         <div
           className={`h-full md:block ${
             mobileView === 'list' ? 'block w-full' : 'hidden'
@@ -53,10 +64,14 @@ export default function App() {
             onSearchChange={setSearchQuery}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
+            // НОВОЕ: Передаем новые пропсы в Sidebar
+            isRoutesTab={isRoutesTab}
+            setIsRoutesTab={setIsRoutesTab}
+            showFoodFilter={showFoodFilter}
+            setShowFoodFilter={setShowFoodFilter}
           />
         </div>
 
-        {/* Right Map Container */}
         <main
           className={`flex-1 h-full relative ${
             mobileView === 'map' ? 'block w-full' : 'hidden'
@@ -70,7 +85,6 @@ export default function App() {
         </main>
       </div>
 
-      {/* Mobile Floating Toggle Button */}
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <button
           onClick={() => setMobileView(mobileView === 'list' ? 'map' : 'list')}
