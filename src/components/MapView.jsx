@@ -10,6 +10,37 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// Цвета меток под категории (ключи = category в places.json)
+const CATEGORY_COLORS = {
+  view: '#F97316',         // оранжевый: смотровые / закаты
+  art: '#8B5CF6',          // фиолетовый: стрит-арт
+  architecture: '#3B82F6', // синий: архитектура
+  photo: '#EC4899',        // розовый: фотолокации
+};
+const DEFAULT_COLOR = '#6B7280';
+
+// Иконка-пин нужного цвета (чистый SVG, без картинок)
+const makeIcon = (color) =>
+  L.divIcon({
+    className: '',
+    html: `
+      <svg width="30" height="42" viewBox="0 0 30 42" xmlns="http://www.w3.org/2000/svg"
+           style="filter: drop-shadow(0 2px 3px rgba(0,0,0,0.45));">
+        <path d="M15 0C6.7 0 0 6.7 0 15c0 11 15 27 15 27s15-16 15-27C30 6.7 23.3 0 15 0z"
+              fill="${color}" stroke="white" stroke-width="2"/>
+        <circle cx="15" cy="15" r="5.5" fill="white"/>
+      </svg>`,
+    iconSize: [30, 42],
+    iconAnchor: [15, 42], // кончик пина = координата точки
+    popupAnchor: [0, -38],
+  });
+
+// Создаём иконки один раз, а не при каждом рендере
+const ICONS = Object.fromEntries(
+  Object.entries(CATEGORY_COLORS).map(([cat, color]) => [cat, makeIcon(color)])
+);
+const DEFAULT_ICON = makeIcon(DEFAULT_COLOR);
+
 function MapController({ selectedPlace }) {
   const map = useMap();
 
@@ -53,6 +84,7 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDe
           <Marker
             key={place.id}
             position={place.coords}
+            icon={ICONS[place.category] || DEFAULT_ICON}
             ref={(ref) => {
               if (ref) markerRefs.current[place.id] = ref;
             }}
