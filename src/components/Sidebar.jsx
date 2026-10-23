@@ -12,12 +12,11 @@ export default function Sidebar({
   onSearchChange,
   selectedCategory,
   onSelectCategory,
-  // ТВОИ НОВЫЕ ПРОПСЫ:
-  isRoutesTab,
-  setIsRoutesTab,
+  routes,
+  selectedRouteId,
+  onSelectRoute,
   showFoodFilter,
   setShowFoodFilter,
-  // ПРОПСЫ ТИМЛИДА (для посещенных мест):
   visitedIds,
   onToggleVisited,
 }) {
@@ -38,9 +37,9 @@ export default function Sidebar({
         <FilterTabs
           selectedCategory={selectedCategory}
           onSelectCategory={onSelectCategory}
-          // ПЕРЕДАЕМ ТВОИ НОВЫЕ ПРОПСЫ:
-          isRoutesTab={isRoutesTab}
-          setIsRoutesTab={setIsRoutesTab}
+          routes={routes}
+          selectedRouteId={selectedRouteId}
+          onSelectRoute={onSelectRoute}
           showFoodFilter={showFoodFilter}
           setShowFoodFilter={setShowFoodFilter}
         />
@@ -51,7 +50,7 @@ export default function Sidebar({
           <div className="h-48 flex flex-col items-center justify-center text-center p-6 text-zinc-500">
             <MapPinOff className="w-8 h-8 mb-2 stroke-[1.5]" />
             <p className="text-sm font-medium text-zinc-300">Ничего не найдено</p>
-            <p className="text-xs text-zinc-500 mt-0.5">Попробуйте изменить категорию или поисковый запрос</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Попробуйте изменить категорию или запрос</p>
           </div>
         ) : (
           places.map((place) => (
