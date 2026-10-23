@@ -21,12 +21,38 @@ const ROUTES = [
   {
     id: 'sunset',
     title: 'Закатный Нижний',
-    placeIds: ['strelka-pakgauzy', 'fedorovsky-embankment', 'chkalov-stairs'],
+    description: 'Панорамы Волги и Оки, набережные и лучшие видовые точки для заката',
+    placeIds: [
+      'fedorovsky-embankment',
+      'suetinskaya-secret-roof',
+      'secret-trail-rozhdestvenskaya',
+      'strelka-pakgauzy',
+      'alexandrovsky-garden-rakushka',
+    ],
   },
   {
     id: 'street-art',
-    title: 'Стрит-арт экспедиция',
-    placeIds: ['pochayna-yards', 'zapovednye-kvartaly', 'kremlin-rampart'],
+    title: 'Стрит-арт и креатив',
+    description: 'Арт-кластеры, инсталляции и независимые культурные пространства',
+    placeIds: [
+      'tseh-nizhpoligraf',
+      'new-house-octyabrskaya',
+      'cargo-margo-krasnaya-sloboda',
+      'sad-imeni',
+    ],
+  },
+  {
+    id: 'history',
+    title: 'Исторический центр',
+    description: 'Старинные купеческие особняки, Кремль и тайные дворики',
+    placeIds: [
+      'severnaya-bashnya-viewpoint',
+      'rukavishnikov-manor',
+      'sirotkin-mansion-nghm',
+      'palace-of-labor-pokrovka',
+      'italian-courtyard-studenaya',
+      'zapovednye-kvartaly-veranda',
+    ],
   },
 ];
 
@@ -35,10 +61,10 @@ export default function App() {
   const [modalPlace, setModalPlace] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [mobileView, setMobileView] = useState('list');
-
   const [selectedRouteId, setSelectedRouteId] = useState(null);
-  const [showFoodFilter, setShowFoodFilter] = useState(false); // Теперь это фильтр по районам
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
+  const [onlyUnvisited, setOnlyUnvisited] = useState(false);
+  const [mobileView, setMobileView] = useState('list');
   const [visitedIds, setVisitedIds] = useState(loadVisitedPlaces);
 
   const toggleVisited = (id) => {
@@ -53,6 +79,32 @@ export default function App() {
     });
   };
 
+  const handleSelectCategory = (category) => {
+    setSelectedCategory(category);
+    setSelectedRouteId(null);
+  };
+
+  const handleSelectRoute = (routeId) => {
+    setSelectedRouteId(routeId);
+    setSelectedCategory('all');
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setSelectedRouteId(null);
+    setSelectedDistrict('all');
+    setOnlyUnvisited(false);
+  };
+
+  const isFiltered = Boolean(
+    searchQuery ||
+    selectedCategory !== 'all' ||
+    selectedRouteId !== null ||
+    selectedDistrict !== 'all' ||
+    onlyUnvisited
+  );
+
   const filteredPlaces = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -61,31 +113,33 @@ export default function App() {
         !query ||
         place.title.toLowerCase().includes(query) ||
         place.description.toLowerCase().includes(query) ||
-        (place.district && place.district.toLowerCase().includes(query));
+        (place.district && place.district.toLowerCase().includes(query)) ||
+        (Array.isArray(place.tags) && place.tags.some((t) => t.toLowerCase().includes(query)));
+
+      const matchesDistrict =
+        selectedDistrict === 'all' || place.district === selectedDistrict;
+
+      const matchesUnvisited =
+        !onlyUnvisited || !visitedIds.includes(place.id);
 
       if (selectedRouteId) {
-        const route = ROUTES.find(r => r.id === selectedRouteId);
-        return matchesSearch && route.placeIds.includes(place.id);
+        const route = ROUTES.find((r) => r.id === selectedRouteId);
+        const matchesRoute = route ? route.placeIds.includes(place.id) : true;
+        return matchesRoute && matchesSearch && matchesDistrict && matchesUnvisited;
       }
 
-      const matchesCategory = selectedCategory === 'all' || place.category === selectedCategory;
-      
-      const matchesDistrict = !showFoodFilter || (place.district && place.district !== '');
+      const matchesCategory =
+        selectedCategory === 'all' || place.category === selectedCategory;
 
-      return matchesCategory && matchesSearch && matchesDistrict;
+      return matchesCategory && matchesSearch && matchesDistrict && matchesUnvisited;
     });
-  }, [searchQuery, selectedCategory, selectedRouteId, showFoodFilter]);
+  }, [searchQuery, selectedCategory, selectedRouteId, selectedDistrict, onlyUnvisited, visitedIds]);
 
   const handleSelectPlace = (place) => {
     setSelectedPlace(place);
     if (window.innerWidth < 768) {
       setMobileView('map');
     }
-  };
-
-  const handleSelectRoute = (routeId) => {
-    setSelectedRouteId(routeId);
-    setSelectedCategory('all'); 
   };
 
   return (
@@ -102,15 +156,16 @@ export default function App() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             selectedCategory={selectedCategory}
-            onSelectCategory={(cat) => {
-              setSelectedCategory(cat);
-              setSelectedRouteId(null); 
-            }}
+            onSelectCategory={handleSelectCategory}
             routes={ROUTES}
             selectedRouteId={selectedRouteId}
             onSelectRoute={handleSelectRoute}
-            showFoodFilter={showFoodFilter}
-            setShowFoodFilter={setShowFoodFilter}
+            selectedDistrict={selectedDistrict}
+            onSelectDistrict={setSelectedDistrict}
+            onlyUnvisited={onlyUnvisited}
+            onToggleOnlyUnvisited={() => setOnlyUnvisited((prev) => !prev)}
+            onResetFilters={handleResetFilters}
+            isFiltered={isFiltered}
             visitedIds={visitedIds}
             onToggleVisited={toggleVisited}
           />
@@ -132,9 +187,9 @@ export default function App() {
           className="flex items-center gap-2 bg-[#3B6E75] hover:bg-[#488790] text-white px-5 py-2.5 rounded-full font-medium shadow-lg shadow-black/50 text-sm transition-colors"
         >
           {mobileView === 'list' ? (
-            <><Map className="w-4 h-4" /><span>Карта</span></>
+            <><Map className="w-4 h-4" /><span>Карта ({filteredPlaces.length})</span></>
           ) : (
-            <><List className="w-4 h-4" /><span>Список мест</span></>
+            <><List className="w-4 h-4" /><span>Список ({filteredPlaces.length})</span></>
           )}
         </button>
       </div>
