@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Utensils, Camera, ChevronDown, ChevronUp, Check, Info } from 'lucide-react';
-import { handleImageFallback } from '../utils/imageFallback.js';
+import { handleImageFallback, getSafeImageUrl } from '../utils/imageFallback.js';
 
 const CATEGORY_NAMES = {
   architecture: 'Архитектура',
@@ -65,7 +65,7 @@ export default function PlaceCard({
     >
       <div className="relative h-40 w-full rounded-lg overflow-hidden bg-zinc-950 mb-2.5">
         <img
-          src={place.imageUrl}
+          src={getSafeImageUrl(place.imageUrl)}
           alt={place.title}
           onError={(e) => handleImageFallback(e, place.category)}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-102"

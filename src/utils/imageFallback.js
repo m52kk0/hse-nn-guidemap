@@ -17,3 +17,11 @@ export function handleImageFallback(e, category) {
   e.target.onerror = null;
   e.target.src = getCategoryFallback(category);
 }
+
+export function getSafeImageUrl(path) {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  // Strip any leading slashes or dot-slashes to avoid double slashes (.//)
+  const clean = path.replace(/^(\.\/|\/)+/, '');
+  return `./${clean}`;
+}

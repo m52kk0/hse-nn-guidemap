@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { handleImageFallback } from '../utils/imageFallback.js';
+import { handleImageFallback, getSafeImageUrl } from '../utils/imageFallback.js';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -95,7 +95,7 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDe
             <Popup className="custom-leaflet-popup">
               <div className="w-56 p-1 text-zinc-100">
                 <img
-                  src={place.imageUrl}
+                  src={getSafeImageUrl(place.imageUrl)}
                   alt={place.title}
                   onError={(e) => handleImageFallback(e, place.category)}
                   className="w-full h-24 object-cover rounded mb-2"

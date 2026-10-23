@@ -10,7 +10,7 @@ import {
   Check,
   Navigation,
 } from 'lucide-react';
-import { handleImageFallback } from '../utils/imageFallback.js';
+import { handleImageFallback, getSafeImageUrl } from '../utils/imageFallback.js';
 
 const CATEGORY_NAMES = {
   architecture: 'Архитектура',
@@ -74,7 +74,7 @@ export default function PlaceDetailModal({
 
         <div className="relative h-56 sm:h-64 w-full shrink-0 bg-zinc-950 overflow-hidden">
           <img
-            src={place.imageUrl}
+            src={getSafeImageUrl(place.imageUrl)}
             alt={place.title}
             onError={(e) => handleImageFallback(e, place.category)}
             className="w-full h-full object-cover"
