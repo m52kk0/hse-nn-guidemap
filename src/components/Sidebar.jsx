@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, MapPinOff } from 'lucide-react';
+import { Search, MapPinOff, RotateCcw } from 'lucide-react';
 import FilterTabs from './FilterTabs.jsx';
 import PlaceCard from './PlaceCard.jsx';
 
@@ -15,8 +15,12 @@ export default function Sidebar({
   routes,
   selectedRouteId,
   onSelectRoute,
-  showFoodFilter,
-  setShowFoodFilter,
+  selectedDistrict,
+  onSelectDistrict,
+  onlyUnvisited,
+  onToggleOnlyUnvisited,
+  onResetFilters,
+  isFiltered,
   visitedIds,
   onToggleVisited,
 }) {
@@ -27,7 +31,7 @@ export default function Sidebar({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input
             type="text"
-            placeholder="Поиск по местам, районам..."
+            placeholder="Поиск по местам, описанию, районам..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-zinc-800 text-zinc-100 placeholder-zinc-500 border border-zinc-700/80 rounded-lg outline-none focus:border-[#3B6E75] focus:ring-1 focus:ring-[#3B6E75] transition-colors"
@@ -40,8 +44,12 @@ export default function Sidebar({
           routes={routes}
           selectedRouteId={selectedRouteId}
           onSelectRoute={onSelectRoute}
-          showFoodFilter={showFoodFilter}
-          setShowFoodFilter={setShowFoodFilter}
+          selectedDistrict={selectedDistrict}
+          onSelectDistrict={onSelectDistrict}
+          onlyUnvisited={onlyUnvisited}
+          onToggleOnlyUnvisited={onToggleOnlyUnvisited}
+          onResetFilters={onResetFilters}
+          isFiltered={isFiltered}
         />
       </div>
 
@@ -50,7 +58,16 @@ export default function Sidebar({
           <div className="h-48 flex flex-col items-center justify-center text-center p-6 text-zinc-500">
             <MapPinOff className="w-8 h-8 mb-2 stroke-[1.5]" />
             <p className="text-sm font-medium text-zinc-300">Ничего не найдено</p>
-            <p className="text-xs text-zinc-500 mt-0.5">Попробуйте изменить категорию или запрос</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Попробуйте изменить категорию или фильтры</p>
+            {isFiltered && (
+              <button
+                onClick={onResetFilters}
+                className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#8ec8ce] hover:text-white bg-[#3B6E75]/20 hover:bg-[#3B6E75]/40 border border-[#3B6E75]/40 rounded-lg transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Сбросить все фильтры</span>
+              </button>
+            )}
           </div>
         ) : (
           places.map((place) => (
