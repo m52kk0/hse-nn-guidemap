@@ -10,10 +10,10 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Границы Нижегородской области и наших локаций (включая Ворсму и Макарьево)
+// Границы Нижегородской области и наших локаций
 const NN_BOUNDS = [
-  [55.60, 42.60], // Юго-запад
-  [56.75, 45.80], // Северо-восток
+  [55.60, 42.60], // Юго-запад (Ворсма, Павлово)
+  [56.75, 45.80], // Северо-восток (Макарьево, Семенов)
 ];
 
 // Цвета меток под категории (ключи = category в places.json)
@@ -41,38 +41,72 @@ const makeIcon = (color) =>
     popupAnchor: [0, -38],
   });
 
-// Создаём иконки один раз, а не при каждом рендере
 const ICONS = Object.fromEntries(
   Object.entries(CATEGORY_COLORS).map(([cat, color]) => [cat, makeIcon(color)])
 );
 const DEFAULT_ICON = makeIcon(DEFAULT_COLOR);
 
-function MapController({ selectedPlace }) {
+function MapController({ selectedPlace, mobileView }) {
   const map = useMap();
 
   useEffect(() => {
-    if (selectedPlace && selectedPlace.coords) {
-      map.flyTo(selectedPlace.coords, 15, {
-        duration: 1.2,
-      });
+    // Безопасный пересчет размеров карты при переключении с мобильного списка на карту
+    try {
+      map.invalidateSize();
+    } catch (e) {
+      // игнорируем первичный рендер
     }
-  }, [selectedPlace, map]);
+
+    const timer = setTimeout(() => {
+      try {
+        map.invalidateSize();
+        if (
+          selectedPlace &&
+          Array.isArray(selectedPlace.coords) &&
+          selectedPlace.coords.length === 2 &&
+          !isNaN(selectedPlace.coords[0]) &&
+          !isNaN(selectedPlace.coords[1])
+        ) {
+          const size = map.getSize();
+          if (size.x > 0 && size.y > 0) {
+            map.flyTo(selectedPlace.coords, 15, {
+              duration: 0.8,
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('MapController safe flyTo:', err);
+      }
+    }, 120);
+
+    return () => clearTimeout(timer);
+  }, [selectedPlace, mobileView, map]);
 
   return null;
 }
 
-export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDetails }) {
+export default function MapView({ places, selectedPlace, mobileView, onSelectPlace, onOpenDetails }) {
   const defaultCenter = [56.3269, 44.0059];
   const markerRefs = useRef({});
 
   useEffect(() => {
     if (selectedPlace && markerRefs.current[selectedPlace.id]) {
-      markerRefs.current[selectedPlace.id].openPopup();
+      const timer = setTimeout(() => {
+        try {
+          const marker = markerRefs.current[selectedPlace.id];
+          if (marker) {
+            marker.openPopup();
+          }
+        } catch (err) {
+          console.warn('Marker openPopup safe error:', err);
+        }
+      }, 250);
+      return () => clearTimeout(timer);
     }
-  }, [selectedPlace]);
+  }, [selectedPlace, mobileView]);
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full bg-zinc-950">
       <MapContainer
         center={defaultCenter}
         zoom={13}
@@ -89,7 +123,7 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDe
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <MapController selectedPlace={selectedPlace} />
+        <MapController selectedPlace={selectedPlace} mobileView={mobileView} />
 
         {places.map((place) => (
           <Marker
@@ -104,7 +138,7 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDe
             }}
           >
             <Popup className="custom-leaflet-popup">
-              <div className="w-56 p-1 text-zinc-100">
+              <div className="w-52 sm:w-56 p-1 text-zinc-100">
                 <img
                   src={getSafeImageUrl(place.imageUrl)}
                   alt={place.title}
@@ -132,7 +166,7 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDe
                       onOpenDetails(place);
                     }
                   }}
-                  className="w-full py-1 px-2 bg-[#3B6E75] hover:bg-[#488790] text-white text-[11px] font-medium rounded transition-colors"
+                  className="w-full py-1.5 px-2 bg-[#3B6E75] hover:bg-[#488790] text-white text-[11px] font-medium rounded transition-colors active:scale-95"
                 >
                   Подробнее
                 </button>

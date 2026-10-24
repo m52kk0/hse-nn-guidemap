@@ -57,29 +57,29 @@ export default function PlaceCard({
     <div
       ref={cardRef}
       onClick={handleCardClick}
-      className={`group cursor-pointer rounded-xl border p-3 transition-colors ${
+      className={`group cursor-pointer rounded-2xl border p-3.5 transition-all duration-200 ${
         isSelected
-          ? 'bg-zinc-800/90 border-[#3B6E75] ring-1 ring-[#3B6E75]'
-          : 'bg-zinc-900 border-zinc-800 hover:border-[#3B6E75]/70'
+          ? 'bg-zinc-850 border-[#3B6E75] ring-2 ring-[#3B6E75]/50 shadow-lg shadow-black/40'
+          : 'bg-zinc-900 border-zinc-800 hover:border-[#3B6E75]/70 hover:bg-zinc-850/60'
       }`}
     >
-      <div className="relative h-40 w-full rounded-lg overflow-hidden bg-zinc-950 mb-2.5">
+      <div className="relative h-44 sm:h-48 w-full rounded-xl overflow-hidden bg-zinc-950 mb-3">
         <img
           src={getSafeImageUrl(place.imageUrl)}
           alt={place.title}
           onError={(e) => handleImageFallback(e, place.category)}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-102"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 pointer-events-none" />
 
-        <div className="absolute top-2 left-2 flex items-center gap-1.5">
-          <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-zinc-900/80 text-zinc-200 border border-zinc-700/70">
+        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 flex-wrap">
+          <span className="text-xs font-medium px-2.5 py-1 rounded-md bg-zinc-900/90 text-zinc-100 border border-zinc-700/80 shadow-sm backdrop-blur-sm">
             {categoryLabel}
           </span>
           {place.district && (
-            <span className="text-[11px] px-2 py-0.5 rounded bg-zinc-900/80 text-zinc-300 border border-zinc-700/70 flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-[#79c0c8]" />
+            <span className="text-xs px-2.5 py-1 rounded-md bg-zinc-900/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1 shadow-sm backdrop-blur-sm">
+              <MapPin className="w-3.5 h-3.5 text-[#79c0c8]" />
               <span>{place.district}</span>
             </span>
           )}
@@ -88,10 +88,10 @@ export default function PlaceCard({
         <button
           type="button"
           onClick={handleVisitedClick}
-          className={`absolute top-2 right-2 text-xs font-medium px-2.5 py-1 rounded flex items-center gap-1 transition-colors ${
+          className={`absolute top-2.5 right-2.5 text-xs sm:text-[13px] font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors shadow-sm backdrop-blur-sm ${
             isVisited
-              ? 'bg-[#3B6E75] text-white shadow-sm'
-              : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border border-zinc-700/70'
+              ? 'bg-[#3B6E75] text-white'
+              : 'bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border border-zinc-700/80'
           }`}
         >
           <Check className={`w-3.5 h-3.5 ${isVisited ? 'stroke-[2.5]' : 'opacity-70'}`} />
@@ -99,30 +99,30 @@ export default function PlaceCard({
         </button>
       </div>
 
-      <div className="space-y-1.5">
-        <h3 className="font-semibold text-zinc-100 text-sm sm:text-base leading-snug group-hover:text-[#79c0c8] transition-colors">
+      <div className="space-y-2">
+        <h3 className="font-bold text-zinc-100 text-base sm:text-lg leading-snug group-hover:text-[#79c0c8] transition-colors">
           {place.title}
         </h3>
 
-        <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+        <p className="text-xs sm:text-sm text-zinc-300 line-clamp-2 leading-relaxed">
           {place.description}
         </p>
 
         {place.photoTips && (
-          <div className="flex items-center gap-1 text-[11px] text-amber-300/80 truncate pt-0.5">
-            <Camera className="w-3 h-3 shrink-0" />
+          <div className="flex items-center gap-1.5 text-xs text-amber-300 font-medium truncate pt-1">
+            <Camera className="w-3.5 h-3.5 shrink-0 text-amber-400" />
             <span className="truncate">{place.photoTips}</span>
           </div>
         )}
       </div>
 
-      <div className="mt-3 pt-2.5 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+      <div className="mt-3.5 pt-3 border-t border-zinc-800 flex items-center justify-between gap-2.5">
         <button
           type="button"
           onClick={handleDetailsClick}
-          className="flex-1 py-1.5 px-3 rounded-lg bg-[#3B6E75] hover:bg-[#488790] text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
+          className="flex-1 py-2 px-3.5 rounded-xl bg-[#3B6E75] hover:bg-[#488790] text-white text-xs sm:text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"
         >
-          <Info className="w-3.5 h-3.5" />
+          <Info className="w-4 h-4" />
           <span>Подробнее</span>
         </button>
 
@@ -130,27 +130,27 @@ export default function PlaceCard({
           <button
             type="button"
             onClick={handleFoodClick}
-            className="py-1.5 px-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium transition-colors flex items-center gap-1 border border-zinc-700/60"
+            className="py-2 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-750 text-zinc-200 text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 border border-zinc-700/80"
           >
             <Utensils className="w-3.5 h-3.5 text-[#79c0c8]" />
             <span>Еда ({place.foodNearby.length})</span>
-            {showFood ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {showFood ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         )}
       </div>
 
       {showFood && place.foodNearby && place.foodNearby.length > 0 && (
-        <div className="mt-2.5 pt-2 border-t border-zinc-800 space-y-1.5">
+        <div className="mt-3 pt-2.5 border-t border-zinc-800 space-y-2">
           {place.foodNearby.map((cafe, idx) => (
             <div
               key={idx}
-              className="text-xs p-2 rounded bg-zinc-850 border border-zinc-800 flex items-center justify-between"
+              className="text-xs sm:text-sm p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-750 flex items-center justify-between"
             >
               <div>
                 <span className="font-medium text-zinc-200">{cafe.name}</span>
-                <span className="text-zinc-500 text-[11px] ml-1.5">({cafe.type})</span>
+                <span className="text-zinc-400 text-xs ml-1.5">({cafe.type})</span>
               </div>
-              <span className="text-[11px] text-[#79c0c8] bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">
+              <span className="text-xs text-[#79c0c8] bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800 font-medium">
                 {cafe.distance}
               </span>
             </div>
