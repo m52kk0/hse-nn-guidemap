@@ -55,3 +55,8 @@
 .leaflet-popup-close-button:hover {
   color: #ffffff !important;
 }
+
+/* Скрыть копирайт Leaflet */
+.leaflet-control-attribution {
+  display: none !important;
+}

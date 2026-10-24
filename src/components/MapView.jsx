@@ -71,6 +71,7 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDe
         center={defaultCenter}
         zoom={13}
         scrollWheelZoom={true}
+        attributionControl={false}
         className="w-full h-full z-0"
       >
         <TileLayer
