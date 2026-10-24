@@ -10,6 +10,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+// Границы Нижегородской области и наших локаций (включая Ворсму и Макарьево)
+const NN_BOUNDS = [
+  [55.60, 42.60], // Юго-запад
+  [56.75, 45.80], // Северо-восток
+];
+
 // Цвета меток под категории (ключи = category в places.json)
 const CATEGORY_COLORS = {
   view: '#F97316',         // оранжевый: смотровые / закаты
@@ -70,6 +76,10 @@ export default function MapView({ places, selectedPlace, onSelectPlace, onOpenDe
       <MapContainer
         center={defaultCenter}
         zoom={13}
+        minZoom={9}
+        maxZoom={18}
+        maxBounds={NN_BOUNDS}
+        maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
         attributionControl={false}
         className="w-full h-full z-0"
